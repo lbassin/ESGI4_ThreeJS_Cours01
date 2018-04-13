@@ -21,3 +21,14 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 renderer.render(scene, camera);
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    mesh.rotation.x += 0.5;
+    mesh.rotation.y += 0.02;
+
+    renderer.render(scene, camera);
+}
+
+animate();
