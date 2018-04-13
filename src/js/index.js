@@ -28,21 +28,29 @@ function animate() {
 animate();
 
 document.body.onkeydown = (event) => {
-    const speed = 24;
+    const speed = 16;
 
     switch (event.keyCode){
         case 37:
             mesh.rotation.y += Math.PI / speed;
+            mesh.scale.y += 0.02;
             break;
         case 38:
             mesh.rotation.x -= Math.PI / speed;
             break;
         case 39:
             mesh.rotation.y -= Math.PI / speed;
+            mesh.scale.y += 0.02;
             break;
         case 40:
             mesh.rotation.x += Math.PI / speed;
             break;
+    }
+};
+
+document.body.onkeyup = (event) => {
+    if(event.keyCode === 37 || event.keyCode === 39){
+        mesh.scale.y = 1;
     }
 };
 
