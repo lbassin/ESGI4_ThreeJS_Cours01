@@ -1,4 +1,3 @@
-// three.js
 import * as THREE from 'three';
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
@@ -54,4 +53,20 @@ document.body.onkeyup = (event) => {
     }
 };
 
-// 37 39
+let mouseEnabled = false;
+document.body.onmousedown = () => {
+    mouseEnabled = true;
+};
+
+document.body.onmouseup = () => {
+    mouseEnabled = false;
+};
+
+document.body.onmousemove = (event) => {
+    if(!mouseEnabled){
+        return false;
+    }
+
+    mesh.rotation.y += event.movementX / 100;
+    mesh.rotation.x += event.movementY / 100;
+};
