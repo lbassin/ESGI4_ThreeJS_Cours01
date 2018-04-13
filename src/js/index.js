@@ -23,10 +23,27 @@ document.body.appendChild(renderer.domElement);
 function animate() {
     requestAnimationFrame(animate);
 
-    mesh.rotation.x += 0.5;
-    mesh.rotation.y += 0.02;
-
     renderer.render(scene, camera);
 }
-
 animate();
+
+document.body.onkeydown = (event) => {
+    const speed = 24;
+
+    switch (event.keyCode){
+        case 37:
+            mesh.rotation.y += Math.PI / speed;
+            break;
+        case 38:
+            mesh.rotation.x -= Math.PI / speed;
+            break;
+        case 39:
+            mesh.rotation.y -= Math.PI / speed;
+            break;
+        case 40:
+            mesh.rotation.x += Math.PI / speed;
+            break;
+    }
+};
+
+// 37 39
