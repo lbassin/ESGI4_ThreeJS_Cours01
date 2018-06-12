@@ -1,72 +1,116 @@
+
+/**************************************************/
+/* exo déplacement FPS                            */
+/**************************************************/
+console.log('exo FPS');
+
+
+// styles
+import '../scss/index.scss';
+
+// three.js
 import * as THREE from 'three';
+import 'three/examples/js/controls/PointerLockControls';
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-camera.position.z = 1000;
 
-const geometry = new THREE.BoxGeometry(200, 200, 200);
-const material = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
-    wireframe: true
-});
+var camera, scene, renderer, geometry, material, mesh;
+var controls;
 
-const mesh = new THREE.Mesh(geometry, material);
 
-const scene = new THREE.Scene();
-scene.add(mesh);
+var keys = [];
+document.onkeydown = function (e) {
+    e = e || window.event;
+    keys[e.keyCode] = true;
+};
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+document.onkeyup = function (e) {
+    e = e || window.event;
+    keys[e.keyCode] = false;
+};
 
-document.body.appendChild(renderer.domElement);
+
+function init() {
+    scene = new THREE.Scene();
+
+    // camera
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+
+    // cubes floor
+    for (var x = 0; x < 30; x++) {
+        for (var y = 0; y < 30; y++) {
+            var geometry = new THREE.BoxGeometry(2, 2, 2);
+            var material = new THREE.MeshBasicMaterial({
+                color: Math.floor(Math.random() * 16777215)
+            });
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x -= x * 2;
+            mesh.position.z -= y * 2;
+            mesh.position.y = -2;
+
+            scene.add(mesh);
+        }
+    }
+
+    // renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+    // mouse view controls
+    controls = new THREE.PointerLockControls(camera);
+    scene.add(controls.getObject());
+
+    // pointer lock
+    var element = document.body;
+
+    var pointerlockchange = function (event) {
+        if (document.pointerLockElement == element) {
+            controls.enabled = true;
+        } else {
+            controls.enabled = false;
+        }
+    };
+    var pointerlockerror = function (event) {};
+
+    // hook pointer lock state change events
+    document.addEventListener('pointerlockchange', pointerlockchange, false);
+    document.addEventListener('pointerlockerror', pointerlockerror, false);
+
+    element.addEventListener('click', function () {
+        element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+        element.requestPointerLock();
+    }, false);
+}
+
+var clock = new THREE.Clock();
 
 function animate() {
     requestAnimationFrame(animate);
 
+    var delta = clock.getDelta();
+    var speed = 10;
+
+    // up
+    if (keys[90]) {
+        controls.getObject().translateZ(-delta * speed);
+    }
+    // down
+    if (keys[83]) {
+        controls.getObject().translateZ(delta * speed);
+    }
+    // left
+    if (keys[81]) {
+        controls.getObject().translateX(-delta * speed);
+    }
+    // right
+    if (keys[68]) {
+        controls.getObject().translateX(delta * speed);
+    }
+
+
     renderer.render(scene, camera);
 }
+
+init();
 animate();
-
-document.body.onkeydown = (event) => {
-    const speed = 16;
-
-    switch (event.keyCode){
-        case 37:
-            mesh.rotation.y += Math.PI / speed;
-            mesh.scale.y += 0.02;
-            break;
-        case 38:
-            mesh.rotation.x -= Math.PI / speed;
-            break;
-        case 39:
-            mesh.rotation.y -= Math.PI / speed;
-            mesh.scale.y += 0.02;
-            break;
-        case 40:
-            mesh.rotation.x += Math.PI / speed;
-            break;
-    }
-};
-
-document.body.onkeyup = (event) => {
-    if(event.keyCode === 37 || event.keyCode === 39){
-        mesh.scale.y = 1;
-    }
-};
-
-let mouseEnabled = false;
-document.body.onmousedown = () => {
-    mouseEnabled = true;
-};
-
-document.body.onmouseup = () => {
-    mouseEnabled = false;
-};
-
-document.body.onmousemove = (event) => {
-    if(!mouseEnabled){
-        return false;
-    }
-
-    mesh.rotation.y += event.movementX / 100;
-    mesh.rotation.x += event.movementY / 100;
-};
